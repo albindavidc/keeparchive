@@ -1,3 +1,4 @@
+
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from './components/navbar.component';
@@ -16,6 +17,7 @@ type AppView = 'home' | 'archive';
 export class AppComponent {
   currentView = signal<AppView>('home');
   showDownloader = signal(false);
+  selectedPlatform = signal('WhatsApp');
 
   navigate(view: AppView) {
     this.currentView.set(view);
@@ -25,8 +27,13 @@ export class AppComponent {
     }
   }
 
-  startDownloadFlow() {
+  startDownloadFlow(platform: string) {
+    // For now, only WhatsApp is fully implemented with local scan. 
+    // Others will reuse the view but we can customize the title/logic via the input.
+    this.selectedPlatform.set(platform.charAt(0).toUpperCase() + platform.slice(1));
     this.showDownloader.set(true);
-    // Smooth scroll to downloader section if needed, though here we just swap the hero
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

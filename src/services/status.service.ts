@@ -1,11 +1,12 @@
+
 import { Injectable, signal, computed } from '@angular/core';
 
 export interface StatusItem {
   id: string;
   type: 'image' | 'video';
   thumbnailUrl: string;
-  contentUrl: string; // Ideally same as thumbnail for this demo
-  contactName: string;
+  contentUrl: string;
+  contactName: string; // Will act as file name or generic identifier for local files
   timestamp: Date;
   viewCount: number;
   isArchived: boolean;
@@ -37,32 +38,36 @@ export class StatusService {
         type: 'image',
         thumbnailUrl: 'https://picsum.photos/400/700?random=101',
         contentUrl: 'https://picsum.photos/400/700?random=101',
-        contactName: 'Sarah J.',
+        contactName: 'Saved_Status_01.jpg',
         timestamp: new Date(Date.now() - 86400000),
-        viewCount: 124,
+        viewCount: 0,
         isArchived: true
       }
     ]);
   }
 
-  // Mock function to simulate scanning/fetching statuses
-  async scanForStatuses(urlOrNumber: string): Promise<void> {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
+  // Mock function to simulate scanning local device storage
+  async scanLocalDevice(): Promise<void> {
+    // Simulate file system read delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Generate mock results
-    const newStatuses: StatusItem[] = Array.from({ length: 6 }).map((_, i) => ({
+    // Generate mock local files from the .Statuses folder
+    const newStatuses: StatusItem[] = Array.from({ length: 8 }).map((_, i) => ({
       id: crypto.randomUUID(),
       type: Math.random() > 0.7 ? 'video' : 'image',
       thumbnailUrl: `https://picsum.photos/400/700?random=${Date.now() + i}`,
       contentUrl: `https://picsum.photos/400/700?random=${Date.now() + i}`,
-      contactName: ['Alice', 'Bob', 'Charlie', 'Diana', 'Evan', 'Fiona'][i],
-      timestamp: new Date(),
-      viewCount: Math.floor(Math.random() * 200),
+      contactName: `Status_${Date.now()}_${i + 1}.${Math.random() > 0.7 ? 'mp4' : 'jpg'}`,
+      timestamp: new Date(Date.now() - Math.floor(Math.random() * 10000000)),
+      viewCount: 0, // Local files don't show view counts usually
       isArchived: false
     }));
 
     this._availableStatuses.set(newStatuses);
+  }
+
+  clearAvailable() {
+    this._availableStatuses.set([]);
   }
 
   toggleArchive(id: string) {
