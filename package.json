@@ -1,6 +1,13 @@
 {
   "name": "keep-archive",
   "private": true,
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch",
+    "test": "ng test"
+  },
   "dependencies": {
     "@angular/common": "^21.0.0",
     "@angular/compiler": "^21.0.0",
@@ -12,6 +19,7 @@
   },
   "devDependencies": {
     "@angular/build": "^21.0.0",
+    "@angular/cli": "^19.0.0",
     "typescript": "^5.9.0"
   }
 }
