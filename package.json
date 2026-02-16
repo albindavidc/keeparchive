@@ -1,25 +1,28 @@
 {
-  "name": "keep-archive",
+  "name": "keeparchive",
   "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
+    "dev": "ng serve",
     "build": "ng build",
-    "watch": "ng build --watch",
-    "test": "ng test"
+    "preview": "ng serve --configuration=production"
   },
   "dependencies": {
-    "@angular/common": "^21.0.0",
-    "@angular/compiler": "^21.0.0",
-    "@angular/core": "^21.0.0",
-    "@angular/forms": "^21.0.0",
-    "@angular/platform-browser": "^21.0.0",
-    "rxjs": "~7.8.0",
-    "tslib": "^2.3.0"
+    "rxjs": "^7.8.2",
+    "@angular/compiler": "^21.1.0",
+    "@angular/platform-browser": "^21.1.0",
+    "@angular/core": "^21.1.0",
+    "@angular/forms": "^21.1.4",
+    "@angular/common": "^21.1.0",
+    "@angular/build": "^21.1.0",
+    "@angular/cli": "^21.1.0",
+    "@angular/compiler-cli": "^21.1.0",
+    "tailwindcss": "latest"
   },
   "devDependencies": {
-    "@angular/build": "^21.0.0",
-    "@angular/cli": "^21.0.0",
-    "typescript": "^5.9.0"
+    "@types/node": "^22.14.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
   }
 }
