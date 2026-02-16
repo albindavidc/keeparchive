@@ -1,0 +1,47 @@
+<div class="flex flex-col h-full bg-slate-50 relative overflow-hidden">
+  
+  <!-- Background Elements -->
+  <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-200/40 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-200/40 rounded-full blur-[120px] pointer-events-none"></div>
+
+  <!-- Navbar -->
+  <app-navbar 
+    [currentTab]="currentView()" 
+    (navigate)="navigate($event)"
+  ></app-navbar>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 overflow-y-auto relative z-10 scroll-smooth">
+    
+    @if (currentView() === 'home') {
+      <!-- Home View Container -->
+      <div class="min-h-[calc(100vh-4rem)] flex flex-col">
+        
+        <!-- Hero Section (Conditionally shown or shrinks) -->
+        @if (!showDownloader()) {
+          <app-hero (onStart)="startDownloadFlow()"></app-hero>
+        } @else {
+          <!-- Compact Header when downloader is active -->
+          <div class="text-center py-8 animate-fade-in-down">
+             <h2 class="text-2xl font-bold text-slate-900">Download Status</h2>
+             <button (click)="showDownloader.set(false)" class="text-sm text-indigo-600 hover:text-indigo-700 font-medium mt-1">
+               &larr; Back to Home
+             </button>
+          </div>
+          <app-downloader></app-downloader>
+        }
+
+      </div>
+    }
+
+    @if (currentView() === 'archive') {
+      <app-archive></app-archive>
+    }
+
+    <!-- Footer -->
+    <footer class="py-6 text-center text-slate-400 text-sm mt-auto">
+      <p>&copy; 2024 KeepArchive. All rights reserved.</p>
+    </footer>
+
+  </main>
+</div>
