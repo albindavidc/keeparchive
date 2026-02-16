@@ -3,123 +3,165 @@ import { Component, signal, inject, computed, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StatusService } from '../services/status.service';
 import { StatusCardComponent } from './status-card.component';
+import { staggerList, slideUp, fadeAnimation } from '../animations';
 
 @Component({
   selector: 'app-downloader',
   standalone: true,
   imports: [CommonModule, StatusCardComponent],
+  animations: [staggerList, slideUp, fadeAnimation],
   template: `
-    <div class="w-full max-w-7xl mx-auto px-4 pb-20 animate-fade-in">
+    <div class="w-full max-w-7xl mx-auto px-4 pb-20" @slideUp>
       
       <!-- Permission & Scan Section -->
       @if (!hasScanned()) {
-        <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mb-8 max-w-2xl mx-auto text-center mt-6">
+        <div class="bg-white rounded-3xl p-6 md:p-8 shadow-xl shadow-slate-200/50 border border-slate-100 mb-8 max-w-2xl mx-auto text-center mt-8">
           
-          <div class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+          <div class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner ring-4 ring-indigo-50/50">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><path d="M15 11h-3v3"></path></svg>
           </div>
 
-          <h3 class="text-2xl font-bold text-slate-900 mb-3">Select Status Folder</h3>
-          <p class="text-slate-600 mb-6 leading-relaxed max-w-md mx-auto text-base">
-            Due to browser security, you must manually select the WhatsApp Status folder to view files.
+          <h3 class="text-2xl font-bold text-slate-900 mb-2 tracking-tight">
+            @if(statusService.isNativePlatform()) {
+              Access Status Folder
+            } @else if(statusService.hasStoredHandle()) {
+              Restore Access
+            } @else {
+              System Permission Required
+            }
+          </h3>
+          
+          <p class="text-slate-600 mb-8 leading-relaxed max-w-lg mx-auto text-base">
+            @if(statusService.isNativePlatform()) {
+              KeepArchive needs permission to read your WhatsApp status folder directly.
+            } @else if(statusService.hasStoredHandle()) {
+              Click below to grant read permission to the previously selected folder.
+            } @else {
+              KeepArchive needs you to manually locate the WhatsApp status folder to read files.
+            }
           </p>
 
-          <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-left max-w-md mx-auto mb-8 text-sm text-amber-800">
-            <p class="font-bold mb-2 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-              How to find it:
-            </p>
-            <ol class="list-decimal list-inside space-y-1 ml-1 opacity-90">
-              <li>Tap <strong>Select Folder</strong> below.</li>
-              <li>Navigate to <strong>Android > media > com.whatsapp > WhatsApp > Media</strong>.</li>
-              <li>Select <strong>.Statuses</strong> (You may need to enable "Show Hidden Files" in your file manager settings first).</li>
-            </ol>
-            <p class="mt-3 text-xs opacity-75">
-              *Note: If you can't find .Statuses, you can select any folder with images to test functionality.
-            </p>
-          </div>
+          <!-- Guide for new users (Web Only) -->
+          @if(!statusService.isNativePlatform() && !statusService.hasStoredHandle()) {
+            <div class="bg-indigo-50/60 border border-indigo-100 rounded-2xl p-5 text-left max-w-md mx-auto mb-8">
+              <h4 class="font-bold text-indigo-900 mb-3 flex items-center gap-2 text-sm uppercase tracking-wide">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Setup Instructions:
+              </h4>
+              
+              <div class="bg-white p-4 rounded-xl border border-indigo-100 shadow-sm mb-4">
+                <p class="text-xs font-bold text-slate-700 mb-2 uppercase">Browser Folder Picker</p>
+                <p class="text-sm text-slate-600 mb-2">When prompted, navigate to:</p>
+                <code class="block bg-slate-50 border border-slate-200 rounded px-2 py-1.5 text-indigo-600 font-mono text-xs break-all">
+                  Android > media > com.whatsapp > WhatsApp > Media > .Statuses
+                </code>
+              </div>
+
+              <div class="bg-indigo-100/50 p-4 rounded-xl border border-indigo-100">
+                <p class="text-xs font-bold text-indigo-900 mb-2 uppercase flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  File Manager (Android)
+                </p>
+                <p class="text-xs text-indigo-900/90 leading-relaxed">
+                  Open your file manager, enable <strong>"Show hidden files"</strong> in settings, and navigate to <code class="bg-white/50 px-1 rounded text-indigo-800 font-bold">WhatsApp > Media > .Statuses</code> to find the files.
+                </p>
+              </div>
+            </div>
+          }
           
           <button 
             (click)="requestPermissionAndScan()"
             [disabled]="isScanning()"
-            class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-semibold rounded-2xl text-white bg-indigo-600 hover:bg-indigo-700 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-70 disabled:scale-100 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-200">
+            class="group relative inline-flex items-center justify-center px-8 py-4 bg-indigo-600 text-white font-semibold rounded-2xl overflow-hidden transition-all hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-indigo-200 w-full sm:w-auto">
+            <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></span>
             @if (isScanning()) {
               <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Scanning...
+              Verifying Access...
             } @else {
-              Select Folder & Scan
+              @if(statusService.isNativePlatform()) {
+                Grant Permission
+              } @else if(statusService.hasStoredHandle()) {
+                Grant Access
+              } @else {
+                Open System Picker
+              }
             }
           </button>
+
+          <!-- Reset Link (Web Only) -->
+           @if(!statusService.isNativePlatform() && statusService.hasStoredHandle()) {
+             <button (click)="fullReset()" class="block mx-auto mt-6 text-xs text-slate-400 hover:text-red-500 underline">
+               Change Folder Location
+             </button>
+           }
         </div>
       }
 
       <!-- Results Section -->
       @if (hasScanned()) {
-        <div class="mb-8 flex flex-col md:flex-row items-center justify-between gap-4 animate-fade-in bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-white shadow-sm sticky top-0 z-30">
+        <!-- Sticky Header Controls -->
+        <div @fadeAnimation class="mb-8 flex flex-col md:flex-row items-center justify-between gap-4 bg-white/80 backdrop-blur-xl p-4 rounded-3xl border border-white/50 shadow-sm sticky top-2 z-30 ring-1 ring-slate-900/5">
           
           <!-- Title & Counter -->
-          <div class="flex items-center gap-3">
-             <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
-               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+          <div class="flex items-center gap-4 w-full md:w-auto">
+             <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-md">
+               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
              </div>
              <div>
-               <h2 class="text-lg font-bold text-slate-800 leading-none">Found Statuses</h2>
-               <p class="text-xs text-slate-500 mt-1">{{ filteredStatuses().length }} items found</p>
+               <h2 class="text-lg font-bold text-slate-900 leading-tight">Status Files</h2>
+               <p class="text-sm text-slate-500 font-medium">{{ filteredStatuses().length }} items found</p>
              </div>
           </div>
           
-          <!-- Tabs & Actions -->
-          <div class="flex flex-wrap items-center justify-center gap-3 w-full md:w-auto">
+          <!-- Controls -->
+          <div class="flex flex-wrap items-center justify-end gap-3 w-full md:w-auto">
             
-            <!-- Filter Tabs -->
-            <div class="flex p-1 bg-slate-100 rounded-xl border border-slate-200">
+            <!-- Segmented Control -->
+            <div class="flex p-1.5 bg-slate-100 rounded-2xl border border-slate-200/50">
               <button 
                 (click)="filterType.set('all')"
-                [class]="filterType() === 'all' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
-                class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200">
+                [class]="filterType() === 'all' ? 'bg-white text-indigo-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'"
+                class="px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-200">
                 All
               </button>
               <button 
                 (click)="filterType.set('image')"
-                [class]="filterType() === 'image' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
-                class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-1">
+                [class]="filterType() === 'image' ? 'bg-white text-indigo-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'"
+                class="px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-200">
                 Photos
               </button>
               <button 
                 (click)="filterType.set('video')"
-                [class]="filterType() === 'video' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
-                class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-1">
+                [class]="filterType() === 'video' ? 'bg-white text-indigo-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'"
+                class="px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-200">
                 Videos
               </button>
             </div>
-
-            <div class="w-px h-8 bg-slate-200 hidden md:block"></div>
-
-            <button (click)="reset()" class="text-sm text-slate-500 hover:text-red-600 font-medium px-3 py-1.5 hover:bg-red-50 rounded-lg transition-colors">
-              Reset
-            </button>
           </div>
         </div>
 
         <!-- Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 animate-fade-in pb-20">
+        <div [@staggerList]="filteredStatuses().length" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 pb-24">
           @for (item of filteredStatuses(); track item.id) {
             <app-status-card 
               [status]="item" 
               (onDownload)="downloadItem($event)"
             />
           } @empty {
-             <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-400 bg-white rounded-3xl border border-dashed border-slate-200">
-               <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+             <div class="col-span-full flex flex-col items-center justify-center py-24 text-slate-400 bg-white/50 backdrop-blur-sm rounded-3xl border-2 border-dashed border-slate-200/60">
+               <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6 ring-8 ring-slate-50/50">
                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                </div>
-               <p class="text-lg font-medium text-slate-600">No {{ filterType() !== 'all' ? filterType() + 's' : 'files' }} found</p>
-               <p class="text-sm text-center max-w-xs text-slate-400 mt-2">
-                 We couldn't find any media files in the folder you selected. Please try selecting a different folder containing images or videos.
+               <h3 class="text-xl font-semibold text-slate-700 mb-2">No {{ filterType() !== 'all' ? filterType() + 's' : 'files' }} found</h3>
+               <p class="text-slate-500 text-center max-w-sm">
+                 We have access to the folder, but it appears empty. Ensure you have viewed some statuses in WhatsApp recently.
                </p>
+               @if(!statusService.isNativePlatform()) {
+                 <button (click)="fullReset()" class="mt-6 text-indigo-600 font-semibold hover:underline text-sm">Select Different Folder</button>
+               }
              </div>
           }
         </div>
@@ -127,12 +169,8 @@ import { StatusCardComponent } from './status-card.component';
     </div>
   `,
   styles: [`
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-fade-in {
-      animation: fadeIn 0.5s ease-out forwards;
+    @keyframes shimmer {
+      100% { transform: translateX(100%); }
     }
   `]
 })
@@ -142,11 +180,8 @@ export class DownloaderComponent {
   
   isScanning = signal(false);
   hasScanned = signal(false);
-  
-  // Tab Filter State
   filterType = signal<'all' | 'image' | 'video'>('all');
 
-  // Computed Filtered List
   filteredStatuses = computed(() => {
     const all = this.statusService.availableStatuses();
     const type = this.filterType();
@@ -160,12 +195,21 @@ export class DownloaderComponent {
     
     try {
       await this.statusService.scanLocalDevice();
-      this.hasScanned.set(true);
+      // Only set hasScanned if we actually got results or successfully tried
+      // If native permission was denied, service shows toast, we don't necessarily show empty grid
+      if (this.statusService.availableStatuses().length > 0 || this.statusService.isNativePlatform()) {
+         this.hasScanned.set(true);
+      }
     } catch (err) {
-      // Error handled in service (e.g., cancelled)
+      // Error handling delegated to service/toast
     } finally {
       this.isScanning.set(false);
     }
+  }
+
+  async fullReset() {
+    await this.statusService.resetPermission();
+    this.reset();
   }
 
   downloadItem(id: string) {
