@@ -4,12 +4,13 @@ import { Injectable, signal, computed } from '@angular/core';
 export interface StatusItem {
   id: string;
   type: 'image' | 'video';
-  thumbnailUrl: string;
-  contentUrl: string;
-  contactName: string; // Will act as file name or generic identifier for local files
+  thumbnailUrl: string; // Will be a blob URL
+  contentUrl: string;   // Will be a blob URL
+  contactName: string; 
   timestamp: Date;
-  viewCount: number;
+  viewCount: number; // Not available from file system, will default to 0
   isArchived: boolean;
+  fileHandle?: any; // FileSystemFileHandle
 }
 
 @Injectable({
@@ -28,45 +29,79 @@ export class StatusService {
   
   // Computed stats
   totalArchived = computed(() => this._archivedStatuses().length);
-  storageUsedMB = computed(() => (this._archivedStatuses().length * 1.5).toFixed(1)); // Mock calculation
+  // Mock size calculation based on count since we don't persist blobs permanently in this demo
+  storageUsedMB = computed(() => (this._archivedStatuses().length * 2.5).toFixed(1)); 
 
   constructor() {
-    // Load mock initial data for archive
-    this._archivedStatuses.set([
-      {
-        id: '101',
-        type: 'image',
-        thumbnailUrl: 'https://picsum.photos/400/700?random=101',
-        contentUrl: 'https://picsum.photos/400/700?random=101',
-        contactName: 'Saved_Status_01.jpg',
-        timestamp: new Date(Date.now() - 86400000),
-        viewCount: 0,
-        isArchived: true
-      }
-    ]);
+    // Start empty - no dummy data
   }
 
-  // Mock function to simulate scanning local device storage
+  /**
+   * Request directory access and scan for media files.
+   * Uses the File System Access API.
+   */
   async scanLocalDevice(): Promise<void> {
-    // Simulate file system read delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Generate mock local files from the .Statuses folder
-    const newStatuses: StatusItem[] = Array.from({ length: 8 }).map((_, i) => ({
-      id: crypto.randomUUID(),
-      type: Math.random() > 0.7 ? 'video' : 'image',
-      thumbnailUrl: `https://picsum.photos/400/700?random=${Date.now() + i}`,
-      contentUrl: `https://picsum.photos/400/700?random=${Date.now() + i}`,
-      contactName: `Status_${Date.now()}_${i + 1}.${Math.random() > 0.7 ? 'mp4' : 'jpg'}`,
-      timestamp: new Date(Date.now() - Math.floor(Math.random() * 10000000)),
-      viewCount: 0, // Local files don't show view counts usually
-      isArchived: false
-    }));
+    try {
+      // @ts-ignore - verify API existence
+      if (typeof window.showDirectoryPicker !== 'function') {
+        alert('Your browser does not support the File System Access API. Please use Chrome or Edge on Android/Desktop.');
+        return;
+      }
 
-    this._availableStatuses.set(newStatuses);
+      // 1. Prompt user to select directory
+      // @ts-ignore
+      const dirHandle = await window.showDirectoryPicker({
+        id: 'whatsapp-status-folder',
+        mode: 'read'
+      });
+
+      const newStatuses: StatusItem[] = [];
+
+      // 2. Iterate through files
+      // @ts-ignore
+      for await (const entry of dirHandle.values()) {
+        if (entry.kind === 'file') {
+          const file = await entry.getFile();
+          
+          // Filter for images and videos
+          if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+            const objectUrl = URL.createObjectURL(file);
+            
+            newStatuses.push({
+              id: entry.name, // Use filename as ID
+              type: file.type.startsWith('video/') ? 'video' : 'image',
+              thumbnailUrl: objectUrl,
+              contentUrl: objectUrl,
+              contactName: entry.name,
+              timestamp: new Date(file.lastModified),
+              viewCount: 0,
+              isArchived: false,
+              fileHandle: entry
+            });
+          }
+        }
+      }
+
+      // Sort by date modified (newest first)
+      newStatuses.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+      this._availableStatuses.set(newStatuses);
+
+    } catch (err) {
+      console.error('Error accessing file system:', err);
+      // User likely cancelled the picker
+      if ((err as Error).name !== 'AbortError') {
+        alert('Failed to access folder. Please try again.');
+      }
+      throw err; // Re-throw to handle UI state in component
+    }
   }
 
   clearAvailable() {
+    // Revoke URLs to free memory
+    this._availableStatuses().forEach(s => {
+      URL.revokeObjectURL(s.contentUrl);
+    });
     this._availableStatuses.set([]);
   }
 
@@ -74,12 +109,18 @@ export class StatusService {
     const available = this._availableStatuses();
     const itemToArchive = available.find(s => s.id === id);
 
+    // Check if already archived to avoid duplicates
+    if (this._archivedStatuses().some(s => s.id === id)) {
+      return; 
+    }
+
     if (itemToArchive) {
-      // Add to archive
-      this._archivedStatuses.update(prev => [
-        { ...itemToArchive, isArchived: true }, 
-        ...prev
-      ]);
+      // Create a copy for the archive
+      // In a real app, we would write this file to a new 'Saved' directory handle.
+      // For this demo, we keep the blob URL reference in the 'Saved' list.
+      const archivedItem = { ...itemToArchive, isArchived: true };
+
+      this._archivedStatuses.update(prev => [archivedItem, ...prev]);
       
       // Update local state to reflect it's archived
       this._availableStatuses.update(prev => 

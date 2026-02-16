@@ -19,36 +19,46 @@ import { StatusCardComponent } from './status-card.component';
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
           </div>
 
-          <h3 class="text-2xl font-bold text-slate-900 mb-3">Access {{ platformName() }} Storage</h3>
-          <p class="text-slate-600 mb-8 leading-relaxed max-w-md mx-auto text-base">
-            To view and save statuses, KeepArchive needs permission to scan your device's temporary media folder.
-            <br/><span class="text-xs text-slate-400 mt-3 block font-mono bg-slate-50 py-1 px-2 rounded border border-slate-100 truncate mx-4">/Android/media/com.whatsapp/WhatsApp/Media/.Statuses</span>
+          <h3 class="text-2xl font-bold text-slate-900 mb-3">Select Status Folder</h3>
+          <p class="text-slate-600 mb-6 leading-relaxed max-w-md mx-auto text-base">
+            Due to browser security, you must manually select the WhatsApp Status folder to view files.
           </p>
+
+          <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-left max-w-md mx-auto mb-8 text-sm text-amber-800">
+            <p class="font-bold mb-2 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              How to find it:
+            </p>
+            <ol class="list-decimal list-inside space-y-1 ml-1 opacity-90">
+              <li>Tap <strong>Select Folder</strong> below.</li>
+              <li>Navigate to <strong>Android > media > com.whatsapp > WhatsApp > Media</strong>.</li>
+              <li>Select <strong>.Statuses</strong> (You may need to enable "Show Hidden Files" in your file manager settings first).</li>
+            </ol>
+            <p class="mt-3 text-xs opacity-75">
+              *Note: If you can't find .Statuses, you can select any folder with images to test functionality.
+            </p>
+          </div>
           
           <button 
             (click)="requestPermissionAndScan()"
             [disabled]="isScanning()"
-            class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-semibold rounded-2xl text-white bg-indigo-600 hover:bg-indigo-700 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-70 disabled:scale-100 disabled:cursor-wait transition-all shadow-lg shadow-indigo-200">
+            class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-semibold rounded-2xl text-white bg-indigo-600 hover:bg-indigo-700 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-70 disabled:scale-100 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-200">
             @if (isScanning()) {
               <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              {{ scanStatusText() }}
+              Scanning...
             } @else {
-              Grant Permission & Scan
+              Select Folder & Scan
             }
           </button>
-
-          <p class="mt-6 text-xs text-slate-400">
-            We only read files from the status directory. No other data is accessed.
-          </p>
         </div>
       }
 
       <!-- Results Section -->
       @if (hasScanned()) {
-        <div class="mb-8 flex flex-col md:flex-row items-center justify-between gap-4 animate-fade-in bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-white shadow-sm sticky top-[4.5rem] z-30">
+        <div class="mb-8 flex flex-col md:flex-row items-center justify-between gap-4 animate-fade-in bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-white shadow-sm sticky top-0 z-30">
           
           <!-- Title & Counter -->
           <div class="flex items-center gap-3">
@@ -89,13 +99,13 @@ import { StatusCardComponent } from './status-card.component';
             <div class="w-px h-8 bg-slate-200 hidden md:block"></div>
 
             <button (click)="reset()" class="text-sm text-slate-500 hover:text-red-600 font-medium px-3 py-1.5 hover:bg-red-50 rounded-lg transition-colors">
-              Rescan
+              Reset
             </button>
           </div>
         </div>
 
         <!-- Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 animate-fade-in">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 animate-fade-in pb-20">
           @for (item of filteredStatuses(); track item.id) {
             <app-status-card 
               [status]="item" 
@@ -106,13 +116,9 @@ import { StatusCardComponent } from './status-card.component';
                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                </div>
-               <p class="text-lg font-medium text-slate-600">No {{ filterType() !== 'all' ? filterType() + 's' : 'statuses' }} found</p>
-               <p class="text-sm text-center max-w-xs">
-                 @if (filterType() === 'all') {
-                   Try viewing some statuses in WhatsApp first.
-                 } @else {
-                   Try switching tabs or check if you have viewed any {{ filterType() }}s recently.
-                 }
+               <p class="text-lg font-medium text-slate-600">No {{ filterType() !== 'all' ? filterType() + 's' : 'files' }} found</p>
+               <p class="text-sm text-center max-w-xs text-slate-400 mt-2">
+                 We couldn't find any media files in the folder you selected. Please try selecting a different folder containing images or videos.
                </p>
              </div>
           }
@@ -136,7 +142,6 @@ export class DownloaderComponent {
   
   isScanning = signal(false);
   hasScanned = signal(false);
-  scanStatusText = signal('Initializing...');
   
   // Tab Filter State
   filterType = signal<'all' | 'image' | 'video'>('all');
@@ -153,20 +158,14 @@ export class DownloaderComponent {
   async requestPermissionAndScan() {
     this.isScanning.set(true);
     
-    // Simulate Android Permission Request
-    this.scanStatusText.set('Requesting Access...');
-    await this.delay(800);
-
-    // Simulate Locating Folder
-    this.scanStatusText.set('Locating .Statuses...');
-    await this.delay(800);
-
-    // Simulate Reading Files
-    this.scanStatusText.set('Reading Files...');
-    await this.statusService.scanLocalDevice();
-    
-    this.isScanning.set(false);
-    this.hasScanned.set(true);
+    try {
+      await this.statusService.scanLocalDevice();
+      this.hasScanned.set(true);
+    } catch (err) {
+      // Error handled in service (e.g., cancelled)
+    } finally {
+      this.isScanning.set(false);
+    }
   }
 
   downloadItem(id: string) {
@@ -177,9 +176,5 @@ export class DownloaderComponent {
     this.hasScanned.set(false);
     this.statusService.clearAvailable();
     this.filterType.set('all');
-  }
-
-  private delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }

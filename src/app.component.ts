@@ -12,7 +12,13 @@ type AppView = 'home' | 'archive';
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, NavbarComponent, HeroComponent, DownloaderComponent, ArchiveComponent],
-  templateUrl: './app.component.html'
+  templateUrl: './app.component.html',
+  styles: [`
+    :host {
+      display: block;
+      height: 100%;
+    }
+  `]
 })
 export class AppComponent {
   currentView = signal<AppView>('home');
@@ -28,12 +34,13 @@ export class AppComponent {
   }
 
   startDownloadFlow(platform: string) {
-    // For now, only WhatsApp is fully implemented with local scan. 
-    // Others will reuse the view but we can customize the title/logic via the input.
     this.selectedPlatform.set(platform.charAt(0).toUpperCase() + platform.slice(1));
     this.showDownloader.set(true);
     
     // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const mainEl = document.querySelector('main');
+    if (mainEl) {
+      mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 }
