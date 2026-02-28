@@ -23,14 +23,14 @@ import { CommonModule } from '@angular/common';
         <button 
           (click)="navigate.emit('home')"
           class="px-3 sm:px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-2"
-          [class]="currentTab() === 'home' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-slate-200 dark:ring-slate-600' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'">
+          [class]="currentTab() === 'home' ? 'bg-indigo-600 text-white shadow-md ring-1 ring-indigo-600 dark:ring-indigo-500' : 'text-slate-600 dark:text-slate-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400'">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           <span class="hidden sm:block">Download</span>
         </button>
         <button 
           (click)="navigate.emit('archive')"
           class="px-3 sm:px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-2"
-          [class]="currentTab() === 'archive' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-slate-200 dark:ring-slate-600' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'">
+          [class]="currentTab() === 'archive' ? 'bg-indigo-600 text-white shadow-md ring-1 ring-indigo-600 dark:ring-indigo-500' : 'text-slate-600 dark:text-slate-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400'">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>
           <span class="hidden sm:block">Library</span>
         </button>

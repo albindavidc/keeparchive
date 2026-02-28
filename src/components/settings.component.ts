@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { slideUp } from '../animations';
 import { ToastService } from '../services/toast.service';
+import { StatusService } from '../services/status.service';
 
 @Component({
   selector: 'app-settings',
@@ -12,6 +13,42 @@ import { ToastService } from '../services/toast.service';
   template: `
     <div @slideUp class="w-full max-w-2xl mx-auto px-4 py-8 pb-20">
       <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Settings</h2>
+
+      <!-- Storage Section -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm mb-6 transition-colors duration-300">
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+          <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-200 uppercase tracking-wider">Storage</h3>
+        </div>
+        
+        <div class="p-6">
+          <div class="flex flex-col gap-4">
+             <div>
+               <p class="font-medium text-slate-900 dark:text-white">Save Location</p>
+               <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                 Current: <span class="font-mono text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded">{{ statusService.saveDirectoryName() }}</span>
+               </p>
+               <p class="text-xs text-slate-400 dark:text-slate-500 mt-2">
+                 Choose a folder on your SD card or internal storage to save status files directly.
+               </p>
+             </div>
+             
+             <div class="flex gap-3 mt-2">
+               <button 
+                 (click)="statusService.changeSaveLocation()"
+                 class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900">
+                 Change Location
+               </button>
+               
+               <button 
+                 *ngIf="statusService.saveDirectoryName() !== 'Internal Storage'"
+                 (click)="statusService.resetSaveLocation()"
+                 class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500">
+                 Reset to Default
+               </button>
+             </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Preferences Section -->
       <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm mb-6 transition-colors duration-300">
@@ -90,6 +127,7 @@ import { ToastService } from '../services/toast.service';
 })
 export class SettingsComponent {
   toast = inject(ToastService);
+  statusService = inject(StatusService);
   
   // Mock settings state
   settings = {

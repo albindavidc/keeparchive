@@ -11,7 +11,7 @@ import { cardAnimation } from '../animations';
   animations: [cardAnimation],
   template: `
     <div 
-      class="group relative aspect-[9/16] rounded-2xl overflow-hidden bg-slate-200 dark:bg-slate-800 cursor-pointer transition-all duration-300 ring-2 ring-transparent"
+      class="group relative aspect-square rounded-2xl overflow-hidden bg-slate-200 dark:bg-slate-800 cursor-pointer transition-all duration-300 ring-2 ring-transparent"
       [class.ring-indigo-500]="status().selected"
       [@cardAnimation]="isHovered() ? 'hovered' : 'initial'"
       (mouseenter)="isHovered.set(true)"

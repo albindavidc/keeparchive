@@ -47,14 +47,22 @@ export class StatusService {
   private readonly DB_NAME = 'KeepArchiveDB';
   private readonly STORE_NAME = 'handles';
   private readonly HANDLE_KEY = 'whatsapp_dir_handle';
+  private readonly SAVE_HANDLE_KEY = 'save_dir_handle';
 
   hasStoredHandle = signal(false);
+  saveDirectoryName = signal<string>('Internal Storage');
+  private saveHandle: any = null;
+  
   isNativePlatform = signal(Capacitor.isNativePlatform());
 
   constructor() {
-    if (!this.isNativePlatform()) {
+    if (this.isNativePlatform()) {
+      // On native, we can try to scan immediately as permissions might already be granted
+      this.scanNative();
+    } else {
       this.initDB().then(() => {
         this.checkStoredHandle();
+        this.checkSaveHandle();
       });
     }
   }
@@ -144,18 +152,26 @@ export class StatusService {
   }
 
   private async checkStoredHandle() {
-    const handle = await this.getStoredHandle();
+    const handle = await this.getStoredItem(this.HANDLE_KEY);
     this.hasStoredHandle.set(!!handle);
   }
 
-  private async getStoredHandle(): Promise<any> {
+  private async checkSaveHandle() {
+    const handle = await this.getStoredItem(this.SAVE_HANDLE_KEY);
+    if (handle) {
+      this.saveHandle = handle;
+      this.saveDirectoryName.set(handle.name);
+    }
+  }
+
+  private async getStoredItem(key: string): Promise<any> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.DB_NAME, 1);
       request.onsuccess = (event: any) => {
         const db = event.target.result;
         const tx = db.transaction(this.STORE_NAME, 'readonly');
         const store = tx.objectStore(this.STORE_NAME);
-        const query = store.get(this.HANDLE_KEY);
+        const query = store.get(key);
         query.onsuccess = () => resolve(query.result);
         query.onerror = () => reject(query.error);
       };
@@ -163,18 +179,29 @@ export class StatusService {
     });
   }
 
-  private async saveStoredHandle(handle: any): Promise<void> {
+  private async saveStoredItem(key: string, value: any): Promise<void> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.DB_NAME, 1);
       request.onsuccess = (event: any) => {
         const db = event.target.result;
         const tx = db.transaction(this.STORE_NAME, 'readwrite');
         const store = tx.objectStore(this.STORE_NAME);
-        store.put(handle, this.HANDLE_KEY);
-        tx.oncomplete = () => {
-          this.hasStoredHandle.set(true);
-          resolve();
-        };
+        store.put(value, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      };
+    });
+  }
+
+  private async deleteStoredItem(key: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.DB_NAME, 1);
+      request.onsuccess = (event: any) => {
+        const db = event.target.result;
+        const tx = db.transaction(this.STORE_NAME, 'readwrite');
+        const store = tx.objectStore(this.STORE_NAME);
+        store.delete(key);
+        tx.oncomplete = () => resolve();
         tx.onerror = () => reject(tx.error);
       };
     });
@@ -188,7 +215,7 @@ export class StatusService {
         return;
       }
 
-      let dirHandle = await this.getStoredHandle();
+      let dirHandle = await this.getStoredItem(this.HANDLE_KEY);
 
       if (dirHandle) {
         // @ts-ignore
@@ -208,7 +235,7 @@ export class StatusService {
           mode: 'read',
           startIn: 'documents' 
         });
-        if (dirHandle) await this.saveStoredHandle(dirHandle);
+        if (dirHandle) await this.saveStoredItem(this.HANDLE_KEY, dirHandle);
       }
 
       const newStatuses: StatusItem[] = [];
@@ -244,16 +271,39 @@ export class StatusService {
 
   async resetPermission() {
     if (this.isNativePlatform()) return; // Not applicable for native logic mostly
-    
-    const request = indexedDB.open(this.DB_NAME, 1);
-    request.onsuccess = (event: any) => {
-      const db = event.target.result;
-      const tx = db.transaction(this.STORE_NAME, 'readwrite');
-      const store = tx.objectStore(this.STORE_NAME);
-      store.delete(this.HANDLE_KEY);
-      this.hasStoredHandle.set(false);
-      this.clearAvailable();
-    };
+    await this.deleteStoredItem(this.HANDLE_KEY);
+    this.hasStoredHandle.set(false);
+    this.clearAvailable();
+  }
+
+  async changeSaveLocation() {
+    try {
+      // @ts-ignore
+      const handle = await window.showDirectoryPicker({
+        id: 'keep-archive-save-folder',
+        mode: 'readwrite',
+        startIn: 'documents'
+      });
+      
+      if (handle) {
+        this.saveHandle = handle;
+        this.saveDirectoryName.set(handle.name);
+        await this.saveStoredItem(this.SAVE_HANDLE_KEY, handle);
+        this.toast.show(`Save location set to: ${handle.name}`, 'success');
+      }
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        console.error('Change save location error:', err);
+        this.toast.show('Failed to change save location.', 'error');
+      }
+    }
+  }
+
+  async resetSaveLocation() {
+    this.saveHandle = null;
+    this.saveDirectoryName.set('Internal Storage');
+    await this.deleteStoredItem(this.SAVE_HANDLE_KEY);
+    this.toast.show('Reset to default storage', 'info');
   }
 
   private processResults(items: StatusItem[]) {
@@ -291,10 +341,44 @@ export class StatusService {
         }
       } else {
         // Web Download logic
-        this.addToArchiveState(itemToArchive);
-        this.triggerBrowserDownload(itemToArchive);
+        if (this.saveHandle) {
+          try {
+            await this.saveToCustomFolder(itemToArchive);
+            this.addToArchiveState(itemToArchive);
+          } catch (e) {
+            console.error(e);
+            this.toast.show('Failed to save to custom folder', 'error');
+          }
+        } else {
+          this.addToArchiveState(itemToArchive);
+          this.triggerBrowserDownload(itemToArchive);
+        }
       }
     }
+  }
+
+  private async saveToCustomFolder(item: StatusItem) {
+    // Verify permission
+    // @ts-ignore
+    const permission = await this.saveHandle.queryPermission({ mode: 'readwrite' });
+    if (permission !== 'granted') {
+      // @ts-ignore
+      const newPermission = await this.saveHandle.requestPermission({ mode: 'readwrite' });
+      if (newPermission !== 'granted') {
+        throw new Error('Permission denied');
+      }
+    }
+
+    // Get file data
+    const file = await item.fileHandle.getFile();
+    
+    // Create file in destination
+    // @ts-ignore
+    const newFileHandle = await this.saveHandle.getFileHandle(item.id, { create: true });
+    // @ts-ignore
+    const writable = await newFileHandle.createWritable();
+    await writable.write(file);
+    await writable.close();
   }
 
   private addToArchiveState(item: StatusItem) {
