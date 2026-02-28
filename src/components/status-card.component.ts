@@ -42,8 +42,8 @@ import { cardAnimation } from '../animations';
       <!-- Video Indicator (Top Left) -->
       @if (status().type === 'video') {
         <div class="absolute top-3 left-3 z-20 pointer-events-none">
-          <div class="bg-black/40 backdrop-blur-md text-white p-2 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <div class="bg-black/40 backdrop-blur-md text-white p-1.5 md:p-2 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
           </div>
         </div>
       }
@@ -60,13 +60,13 @@ import { cardAnimation } from '../animations';
       @if (!status().isArchived) {
         <button 
           (click)="onDownload.emit(status().id); $event.stopPropagation()"
-          class="md:hidden absolute bottom-3 right-3 bg-indigo-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-30 active:scale-95 transition-transform"
+          class="md:hidden absolute bottom-3 right-3 bg-indigo-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg z-30 active:scale-95 transition-transform"
           aria-label="Download">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
         </button>
       } @else {
-        <div class="md:hidden absolute bottom-3 right-3 bg-emerald-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-30">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <div class="md:hidden absolute bottom-3 right-3 bg-emerald-500 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg z-30">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
         </div>
       }
 
@@ -74,7 +74,7 @@ import { cardAnimation } from '../animations';
       <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none md:pointer-events-auto">
         
         <!-- File Info -->
-        <div class="text-white mb-1 md:mb-3">
+        <div class="text-white mb-1 md:mb-3 hidden md:block">
           <h3 class="font-medium text-xs truncate w-full opacity-90" [title]="status().contactName">{{ status().contactName }}</h3>
           <div class="flex items-center gap-2 text-[10px] text-slate-300 mt-1">
              <span>{{ status().timestamp | date:'MMM d' }}</span>
