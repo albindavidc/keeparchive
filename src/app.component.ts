@@ -1,5 +1,5 @@
 
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from './components/navbar.component';
 import { DownloaderComponent } from './components/downloader.component';
@@ -31,75 +31,70 @@ type AppView = 'home' | 'archive' | 'settings';
     @if (showSplash()) {
       <app-splash (finished)="onSplashFinished()" />
     } @else {
-      <div class="flex flex-col h-full bg-slate-50 relative overflow-hidden text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
-        
-        <!-- Global Toasts -->
-        <app-toast />
-
-        <!-- Media Viewer Overlay -->
-        @if (viewingItem()) {
-          <app-media-viewer 
-            [status]="viewingItem()!" 
-            (close)="closeViewer()"
-            (onDownload)="downloadFromViewer($event)"
-          />
-        }
-
-        <!-- Background Ambient Elements -->
-        <div class="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-purple-200/30 rounded-full blur-[120px] pointer-events-none z-0"></div>
-        <div class="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-indigo-200/30 rounded-full blur-[120px] pointer-events-none z-0"></div>
-
-        <!-- Navbar -->
-        <app-navbar 
-          [currentTab]="currentView()" 
-          (navigate)="navigate($event)"
-          (platformChange)="startDownloadFlow($event)"
-        ></app-navbar>
-
-        <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto relative z-10 scroll-smooth">
+      <div [class.dark]="isDarkMode()" class="h-full">
+        <div class="flex flex-col h-full bg-slate-50 dark:bg-slate-950 relative overflow-hidden text-slate-900 dark:text-slate-100 font-sans selection:bg-indigo-100 selection:text-indigo-900 dark:selection:bg-indigo-900 dark:selection:text-indigo-100 transition-colors duration-300">
           
-          <div [@fadeAnimation]="currentView()" class="min-h-full">
-            
-            @switch (currentView()) {
-              @case ('home') {
-                 <div class="flex flex-col min-h-[calc(100vh-4rem)]">
-                    <!-- Compact Header when downloader is active -->
-                    <div @fadeAnimation class="bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-40 py-3 shadow-sm">
-                       <div class="max-w-7xl mx-auto px-4 flex items-center justify-between">
-                         <div class="flex items-center gap-2">
-                           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-emerald-200 shadow-lg"></span>
-                           <h2 class="text-sm font-bold text-slate-800">{{ selectedPlatform() }} Downloader</h2>
-                         </div>
-                       </div>
-                    </div>
-                    <app-downloader 
-                      [platformName]="selectedPlatform()"
-                      (onViewItem)="openViewer($event)"
-                    ></app-downloader>
-                 </div>
-              }
-              @case ('archive') {
-                <app-archive></app-archive>
-              }
-              @case ('settings') {
-                <app-settings></app-settings>
-              }
-            }
+          <!-- Global Toasts -->
+          <app-toast />
 
-            <!-- Footer -->
-            <footer class="py-8 text-center text-slate-400 text-sm mt-auto border-t border-slate-100 bg-white/50">
-              <div class="flex items-center justify-center gap-2 mb-2">
-                 <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-                 <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-                 <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-              </div>
-              <p>&copy; 2026 KeepArchive. Your memories, secure & local.</p>
-            </footer>
-            
-          </div>
+          <!-- Media Viewer Overlay -->
+          @if (viewingItem()) {
+            <app-media-viewer 
+              [status]="viewingItem()!" 
+              (close)="closeViewer()"
+              (onDownload)="downloadFromViewer($event)"
+            />
+          }
 
-        </main>
+          <!-- Background Ambient Elements -->
+          <div class="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-purple-200/30 dark:bg-purple-900/20 rounded-full blur-[120px] pointer-events-none z-0 transition-colors duration-500"></div>
+          <div class="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-indigo-200/30 dark:bg-indigo-900/20 rounded-full blur-[120px] pointer-events-none z-0 transition-colors duration-500"></div>
+
+          <!-- Navbar -->
+          <app-navbar 
+            [currentTab]="currentView()" 
+            [isDarkMode]="isDarkMode()"
+            (navigate)="navigate($event)"
+            (platformChange)="startDownloadFlow($event)"
+            (toggleTheme)="toggleTheme()"
+          ></app-navbar>
+
+          <!-- Main Content Area -->
+          <main class="flex-1 overflow-y-auto relative z-10 scroll-smooth">
+            
+            <div [@fadeAnimation]="currentView()" class="min-h-full">
+              
+              @switch (currentView()) {
+                @case ('home') {
+                   <div class="flex flex-col min-h-[calc(100vh-4rem)] pt-6">
+                      <app-downloader 
+                        [platformName]="selectedPlatform()"
+                        (onViewItem)="openViewer($event)"
+                      ></app-downloader>
+                   </div>
+                }
+                @case ('archive') {
+                  <app-archive></app-archive>
+                }
+                @case ('settings') {
+                  <app-settings></app-settings>
+                }
+              }
+
+              <!-- Footer -->
+              <footer class="py-8 text-center text-slate-400 dark:text-slate-600 text-sm mt-auto border-t border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm transition-colors duration-300">
+                <div class="flex items-center justify-center gap-2 mb-2">
+                   <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+                   <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+                   <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+                </div>
+                <p>&copy; 2026 KeepArchive. Your memories, secure & local.</p>
+              </footer>
+              
+            </div>
+
+          </main>
+        </div>
       </div>
     }
   `,
@@ -116,6 +111,13 @@ export class AppComponent {
   selectedPlatform = signal('WhatsApp');
   showSplash = signal(true);
   viewingItem = signal<StatusItem | null>(null);
+  isDarkMode = signal(false);
+
+  constructor() {
+    // Check system preference initially
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    this.isDarkMode.set(prefersDark);
+  }
 
   onSplashFinished() {
     this.showSplash.set(false);
@@ -148,5 +150,9 @@ export class AppComponent {
 
   downloadFromViewer(id: string) {
     this.statusService.toggleArchive(id);
+  }
+
+  toggleTheme() {
+    this.isDarkMode.update(v => !v);
   }
 }

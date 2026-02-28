@@ -7,29 +7,29 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <nav class="w-full h-16 glass border-b border-slate-200 sticky top-0 z-50 flex items-center justify-between px-4 md:px-8 bg-white/80 backdrop-blur-md">
+    <nav class="w-full h-16 glass border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 flex items-center justify-between px-4 md:px-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md transition-colors duration-300">
       <!-- Logo -->
       <div class="flex items-center gap-3 cursor-pointer group" (click)="navigate.emit('home')">
-        <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 group-hover:scale-105 transition-transform">
+        <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 dark:from-indigo-600 dark:to-purple-700 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50 group-hover:scale-105 transition-transform">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
         </div>
-        <span class="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 hidden sm:block">
+        <span class="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 hidden sm:block">
           KeepArchive
         </span>
       </div>
 
       <!-- Nav Links -->
-      <div class="flex gap-1.5 bg-slate-100 p-1.5 rounded-full border border-slate-200/60">
+      <div class="flex gap-1.5 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-full border border-slate-200/60 dark:border-slate-700/60 transition-colors duration-300">
         <button 
           (click)="navigate.emit('home')"
           class="px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-200"
-          [class]="currentTab() === 'home' ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'">
+          [class]="currentTab() === 'home' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-slate-200 dark:ring-slate-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'">
           Download
         </button>
         <button 
           (click)="navigate.emit('archive')"
           class="px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-2"
-          [class]="currentTab() === 'archive' ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'">
+          [class]="currentTab() === 'archive' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-slate-200 dark:ring-slate-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'">
           Library
         </button>
       </div>
@@ -37,18 +37,35 @@ import { CommonModule } from '@angular/common';
       <!-- Right Side Actions -->
       <div class="flex items-center gap-3">
         
+        <!-- Theme Toggle -->
+        <button 
+          (click)="toggleTheme.emit()"
+          class="w-10 h-10 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+          @if(isDarkMode()) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          }
+        </button>
+
         <!-- Platform Dropdown -->
         <div class="relative">
           <button 
             (click)="toggleDropdown()"
-            class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-sm font-semibold transition-all border border-slate-200 hover:border-slate-300 shadow-sm active:scale-95">
+            class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold transition-all border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm active:scale-95">
             <div class="w-6 h-6 rounded-lg flex items-center justify-center" 
               [class.bg-emerald-100]="selectedPlatform() === 'WhatsApp'"
               [class.text-emerald-600]="selectedPlatform() === 'WhatsApp'"
               [class.bg-pink-100]="selectedPlatform() === 'Instagram'"
               [class.text-pink-600]="selectedPlatform() === 'Instagram'"
               [class.bg-blue-100]="selectedPlatform() === 'Facebook'"
-              [class.text-blue-600]="selectedPlatform() === 'Facebook'">
+              [class.text-blue-600]="selectedPlatform() === 'Facebook'"
+              [class.dark:bg-emerald-900/30]="selectedPlatform() === 'WhatsApp'"
+              [class.dark:text-emerald-400]="selectedPlatform() === 'WhatsApp'"
+              [class.dark:bg-pink-900/30]="selectedPlatform() === 'Instagram'"
+              [class.dark:text-pink-400]="selectedPlatform() === 'Instagram'"
+              [class.dark:bg-blue-900/30]="selectedPlatform() === 'Facebook'"
+              [class.dark:text-blue-400]="selectedPlatform() === 'Facebook'">
               @if(selectedPlatform() === 'WhatsApp') {
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
               } @else if(selectedPlatform() === 'Instagram') {
@@ -62,37 +79,33 @@ import { CommonModule } from '@angular/common';
           </button>
 
           @if (isDropdownOpen()) {
-            <div class="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
-              <div class="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Select Platform</div>
+            <div class="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-800 py-2 z-50 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+              <div class="px-4 py-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Select Platform</div>
               
-              <button (click)="selectPlatform('WhatsApp')" class="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-indigo-700 flex items-center gap-3 transition-colors">
-                <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+              <button (click)="selectPlatform('WhatsApp')" class="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-indigo-700 dark:hover:text-indigo-400 flex items-center gap-3 transition-colors">
+                <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                 </div>
                 WhatsApp
                 @if(selectedPlatform() === 'WhatsApp') {
-                  <svg class="ml-auto text-indigo-600" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <svg class="ml-auto text-indigo-600 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 }
               </button>
               
-              <button (click)="selectPlatform('Instagram')" class="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-indigo-700 flex items-center gap-3 transition-colors">
-                <div class="w-8 h-8 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center">
+              <button disabled class="w-full text-left px-4 py-3 text-sm font-medium text-slate-400 dark:text-slate-600 cursor-not-allowed flex items-center gap-3 transition-colors opacity-75">
+                <div class="w-8 h-8 rounded-full bg-pink-50 dark:bg-pink-900/10 text-pink-300 dark:text-pink-800/50 flex items-center justify-center grayscale">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                 </div>
                 Instagram
-                @if(selectedPlatform() === 'Instagram') {
-                  <svg class="ml-auto text-indigo-600" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                }
+                <span class="ml-auto text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 px-2 py-0.5 rounded-full tracking-wide">SOON</span>
               </button>
               
-              <button (click)="selectPlatform('Facebook')" class="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-indigo-700 flex items-center gap-3 transition-colors">
-                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+              <button disabled class="w-full text-left px-4 py-3 text-sm font-medium text-slate-400 dark:text-slate-600 cursor-not-allowed flex items-center gap-3 transition-colors opacity-75">
+                <div class="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/10 text-blue-300 dark:text-blue-800/50 flex items-center justify-center grayscale">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
                 </div>
                 Facebook
-                @if(selectedPlatform() === 'Facebook') {
-                  <svg class="ml-auto text-indigo-600" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                }
+                <span class="ml-auto text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 px-2 py-0.5 rounded-full tracking-wide">SOON</span>
               </button>
             </div>
             <!-- Backdrop to close -->
@@ -104,8 +117,10 @@ import { CommonModule } from '@angular/common';
         <button 
           (click)="navigate.emit('settings')"
           [class.bg-slate-200]="currentTab() === 'settings'"
+          [class.dark:bg-slate-700]="currentTab() === 'settings'"
           [class.text-indigo-600]="currentTab() === 'settings'"
-          class="w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors border border-transparent hover:border-slate-200">
+          [class.dark:text-indigo-400]="currentTab() === 'settings'"
+          class="w-10 h-10 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </button>
       </div>
@@ -114,8 +129,10 @@ import { CommonModule } from '@angular/common';
 })
 export class NavbarComponent {
   currentTab = input.required<'home' | 'archive' | 'settings'>();
+  isDarkMode = input<boolean>(false);
   navigate = output<'home' | 'archive' | 'settings'>();
   platformChange = output<string>();
+  toggleTheme = output<void>();
 
   isDropdownOpen = signal(false);
   selectedPlatform = signal('WhatsApp');
