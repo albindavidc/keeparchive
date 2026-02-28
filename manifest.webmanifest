@@ -1,6 +1,6 @@
 {
-  "name": "KeepArchive",
-  "short_name": "KeepArchive",
+  "name": "Archive",
+  "short_name": "Archive",
   "theme_color": "#6366f1",
   "background_color": "#ffffff",
   "display": "standalone",

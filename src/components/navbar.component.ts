@@ -12,7 +12,7 @@ import { PwaService } from '../services/pwa.service';
       <!-- Logo -->
       <div class="flex items-center gap-3 cursor-pointer group" (click)="navigate.emit('home')">
         <span class="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 hidden sm:block">
-          KeepArchive
+          Archive
         </span>
       </div>
 

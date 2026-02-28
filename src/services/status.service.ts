@@ -48,10 +48,10 @@ export class StatusService {
     '/storage/emulated/0/WhatsApp Business/Media/.Statuses', // Older Android Business
   ];
   
-  private readonly DOWNLOAD_FOLDER = 'KeepArchive';
+  private readonly DOWNLOAD_FOLDER = 'Archive';
 
   // Web DB Config
-  private readonly DB_NAME = 'KeepArchiveDB';
+  private readonly DB_NAME = 'ArchiveDB';
   private readonly STORE_NAME = 'handles';
   private readonly HANDLE_KEY = 'whatsapp_dir_handle';
   private readonly SAVE_HANDLE_KEY = 'save_dir_handle';
@@ -312,7 +312,7 @@ export class StatusService {
   async changeSaveLocation() {
     try {
       // Prompt user to select SD card root
-      const confirmSd = confirm('To switch to SD Card storage:\n\n1. In the next screen, select your SD Card root folder (or any parent folder).\n2. We will automatically create a "KeepArchive" folder inside it to store your files.\n\nDo you want to proceed?');
+      const confirmSd = confirm('To switch to SD Card storage:\n\n1. In the next screen, select your SD Card root folder (or any parent folder).\n2. We will automatically create an "Archive" folder inside it to store your files.\n\nDo you want to proceed?');
       
       if (!confirmSd) return;
 
@@ -324,18 +324,18 @@ export class StatusService {
       });
       
       if (rootHandle) {
-        // Create or get 'KeepArchive' folder inside the selected root
+        // Create or get 'Archive' folder inside the selected root
         // @ts-ignore
-        const archiveHandle = await rootHandle.getDirectoryHandle('KeepArchive', { create: true });
+        const archiveHandle = await rootHandle.getDirectoryHandle('Archive', { create: true });
 
         this.saveHandle = archiveHandle;
-        // Display path as "Parent/KeepArchive"
-        this.saveDirectoryName.set(`${rootHandle.name}/KeepArchive`);
+        // Display path as "Parent/Archive"
+        this.saveDirectoryName.set(`${rootHandle.name}/Archive`);
         
-        // Store the handle for the 'KeepArchive' folder, not the root
+        // Store the handle for the 'Archive' folder, not the root
         await this.saveStoredItem(this.SAVE_HANDLE_KEY, archiveHandle);
         
-        this.toast.show(`Storage set to: ${rootHandle.name}/KeepArchive`, 'success');
+        this.toast.show(`Storage set to: ${rootHandle.name}/Archive`, 'success');
       }
     } catch (err) {
       if ((err as Error).name !== 'AbortError') {
@@ -467,7 +467,7 @@ export class StatusService {
         path: item.nativePath!
       });
       
-      // 3. Write to the destination in Documents/KeepArchive
+      // 3. Write to the destination in Documents/Archive
       await Filesystem.writeFile({
         path: destPath,
         data: file.data,
@@ -499,7 +499,7 @@ export class StatusService {
   private triggerBrowserDownload(item: StatusItem) {
     const a = document.createElement('a');
     a.href = item.contentUrl;
-    a.download = `KA_${item.id.substring(0, 10)}`; 
+    a.download = `Archive_${item.id.substring(0, 10)}`; 
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

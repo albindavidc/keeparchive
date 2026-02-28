@@ -110,7 +110,7 @@ export class MediaViewerComponent {
         await navigator.share({
           files: [file],
           title: 'Share Status',
-          text: 'Shared via KeepArchive'
+          text: 'Shared via Archive'
         });
       } catch (err) {
         console.error('Share failed', err);

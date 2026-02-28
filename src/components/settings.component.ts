@@ -29,7 +29,7 @@ import { PwaService } from '../services/pwa.service';
                  Current: <span class="font-mono text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded">{{ statusService.saveDirectoryName() }}</span>
                </p>
                <p class="text-xs text-slate-400 dark:text-slate-500 mt-2">
-                 Select your SD card or any storage location. A 'KeepArchive' folder will be automatically created to store your files.
+                 Select your SD card or any storage location. An 'Archive' folder will be automatically created to store your files.
                </p>
              </div>
              
@@ -99,7 +99,7 @@ import { PwaService } from '../services/pwa.service';
           <div class="flex items-center justify-between p-6" *ngIf="pwaService.installable()">
              <div>
                <p class="font-medium text-slate-900 dark:text-white">Install App</p>
-               <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Install KeepArchive on your device for a better experience</p>
+               <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Install Archive on your device for a better experience</p>
              </div>
              <button 
                (click)="pwaService.promptInstall()"
@@ -122,12 +122,12 @@ import { PwaService } from '../services/pwa.service';
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             </div>
             <div>
-              <h4 class="font-bold text-slate-900 dark:text-white">KeepArchive</h4>
+              <h4 class="font-bold text-slate-900 dark:text-white">Archive</h4>
               <p class="text-sm text-slate-500 dark:text-slate-400">Version 1.0.0 (Beta)</p>
             </div>
           </div>
           <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-            KeepArchive allows you to save and organize temporary social media statuses locally. 
+            Archive allows you to save and organize temporary social media statuses locally. 
             All data stays on your device and is never uploaded to any server.
           </p>
           <div class="flex gap-4 mt-6">

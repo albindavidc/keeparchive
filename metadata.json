@@ -1,5 +1,5 @@
 {
-  "name": "KeepArchive",
+  "name": "Archive",
   "description": "A modern social media status and stories downloader application focused on preserving meaningful moments.",
   "requestFramePermissions": [
     "camera",

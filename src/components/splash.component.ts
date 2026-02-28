@@ -18,7 +18,7 @@ import { fadeAnimation } from '../animations';
       </div>
       
       <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-2 tracking-tight">
-        KeepArchive
+        Archive
       </h1>
       <p class="text-slate-400 dark:text-slate-500 font-medium tracking-wide text-sm uppercase">Your Memories, Local & Safe</p>
       

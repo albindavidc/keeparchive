@@ -88,7 +88,7 @@ type AppView = 'home' | 'archive' | 'settings';
                    <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
                    <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
                 </div>
-                <p>&copy; 2026 KeepArchive. Your memories, secure & local.</p>
+                <p>&copy; 2026 Archive. Your memories, secure & local.</p>
               </footer>
               
             </div>

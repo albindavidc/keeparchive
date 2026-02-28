@@ -33,11 +33,11 @@ import { staggerList, slideUp, fadeAnimation } from '../animations';
           
           <p class="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed max-w-lg mx-auto text-base">
             @if(statusService.isNativePlatform()) {
-              KeepArchive needs permission to read your WhatsApp status folder directly.
+              Archive needs permission to read your WhatsApp status folder directly.
             } @else if(statusService.hasStoredHandle()) {
               Click below to grant read permission to the previously selected folder.
             } @else {
-              KeepArchive needs you to manually locate the WhatsApp status folder to read files.
+              Archive needs you to manually locate the WhatsApp status folder to read files.
             }
           </p>
 
