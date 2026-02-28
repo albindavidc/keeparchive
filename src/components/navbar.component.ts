@@ -1,6 +1,7 @@
 
-import { Component, output, input, signal, Inject, PLATFORM_ID, afterNextRender } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, output, input, signal, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { PwaService } from '../services/pwa.service';
 
 @Component({
   selector: 'app-navbar',
@@ -10,9 +11,6 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
     <nav class="w-full h-16 glass border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 flex items-center justify-between px-4 md:px-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md transition-colors duration-300">
       <!-- Logo -->
       <div class="flex items-center gap-3 cursor-pointer group" (click)="navigate.emit('home')">
-        <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 dark:from-indigo-600 dark:to-purple-700 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50 group-hover:scale-105 transition-transform">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-        </div>
         <span class="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 hidden sm:block">
           KeepArchive
         </span>
@@ -40,6 +38,17 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
       <div class="flex items-center gap-3">
         
         <!-- Theme Toggle / PWA Install -->
+        
+        <!-- Desktop: Install PWA (if available) -->
+        @if (pwaService.installable()) {
+          <button 
+            (click)="pwaService.promptInstall()"
+            class="hidden md:flex w-10 h-10 rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-900/20 items-center justify-center text-indigo-600 dark:text-indigo-400 transition-colors border border-transparent hover:border-indigo-100 dark:hover:border-indigo-800/30 mr-2"
+            title="Install App">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+        }
+
         <!-- Desktop: Always Theme Toggle -->
         <button 
           (click)="toggleTheme.emit()"
@@ -53,9 +62,9 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 
         <!-- Mobile: Install PWA if available, else Theme Toggle -->
         <div class="md:hidden">
-          @if (showInstallButton()) {
+          @if (pwaService.installable()) {
             <button 
-              (click)="installPwa()"
+              (click)="pwaService.promptInstall()"
               class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center transition-colors animate-pulse">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             </button>
@@ -103,7 +112,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
           </button>
 
           @if (isDropdownOpen()) {
-            <div class="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-800 py-2 z-50 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+            <div class="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-800 py-2 z-[101] animate-in fade-in zoom-in-95 duration-200 origin-top-right">
               <div class="px-4 py-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Select Platform</div>
               
               <button (click)="selectPlatform('WhatsApp')" class="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-700 dark:hover:text-indigo-400 flex items-center gap-3 transition-colors">
@@ -133,7 +142,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
               </button>
             </div>
             <!-- Backdrop to close -->
-            <div class="fixed inset-0 z-40" (click)="toggleDropdown()"></div>
+            <div class="fixed inset-0 z-[100]" (click)="toggleDropdown()"></div>
           }
         </div>
 
@@ -161,33 +170,7 @@ export class NavbarComponent {
   isDropdownOpen = signal(false);
   selectedPlatform = signal('WhatsApp');
   
-  showInstallButton = signal(false);
-  deferredPrompt: any = null;
-
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    if (isPlatformBrowser(this.platformId)) {
-      afterNextRender(() => {
-        // Check if already installed
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-        if (isStandalone) {
-          this.showInstallButton.set(false);
-        }
-
-        // Listen for install prompt
-        window.addEventListener('beforeinstallprompt', (e) => {
-          e.preventDefault();
-          this.deferredPrompt = e;
-          this.showInstallButton.set(true);
-        });
-
-        // Listen for app installed
-        window.addEventListener('appinstalled', () => {
-          this.showInstallButton.set(false);
-          this.deferredPrompt = null;
-        });
-      });
-    }
-  }
+  pwaService = inject(PwaService);
 
   toggleDropdown() {
     this.isDropdownOpen.update(v => !v);
@@ -197,17 +180,5 @@ export class NavbarComponent {
     this.selectedPlatform.set(platform);
     this.platformChange.emit(platform);
     this.isDropdownOpen.set(false);
-  }
-
-  async installPwa() {
-    if (!this.deferredPrompt) return;
-    
-    this.deferredPrompt.prompt();
-    const { outcome } = await this.deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      this.showInstallButton.set(false);
-    }
-    this.deferredPrompt = null;
   }
 }

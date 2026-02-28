@@ -20,7 +20,8 @@
             "tsConfig": "tsconfig.json",
             "assets": [
               "manifest.webmanifest",
-              "favicon.svg"
+              "favicon.svg",
+              "icon.svg"
             ]
           },
           "configurations": {
