@@ -39,10 +39,12 @@ import { cardAnimation } from '../animations';
         />
        }
       
-      <!-- Video Indicator -->
+      <!-- Video Indicator (Centered) -->
       @if (status().type === 'video') {
-        <div class="absolute top-3 right-3 bg-black/40 backdrop-blur-md text-white p-2 rounded-full pointer-events-none">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+          <div class="bg-black/40 backdrop-blur-md text-white p-3 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          </div>
         </div>
       }
 
@@ -55,7 +57,7 @@ import { cardAnimation } from '../animations';
       }
 
       <!-- Gradient Overlay -->
-      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
         
         <!-- File Info -->
         <div class="text-white mb-3">
