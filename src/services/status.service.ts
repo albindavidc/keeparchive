@@ -1,4 +1,5 @@
 
+
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { ToastService } from './toast.service';
 import { Capacitor } from '@capacitor/core';
@@ -39,8 +40,14 @@ export class StatusService {
     return (totalBytes / (1024 * 1024)).toFixed(1);
   });
 
-  // Native Config
-  private readonly WHATSAPP_STATUS_PATH = '/storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/.Statuses';
+  // Native Config - Multiple potential paths
+  private readonly WHATSAPP_PATHS = [
+    '/storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/.Statuses', // Android 11+ Standard
+    '/storage/emulated/0/WhatsApp/Media/.Statuses', // Older Android Standard
+    '/storage/emulated/0/Android/media/com.whatsapp.w4b/WhatsApp Business/Media/.Statuses', // Android 11+ Business
+    '/storage/emulated/0/WhatsApp Business/Media/.Statuses', // Older Android Business
+  ];
+  
   private readonly DOWNLOAD_FOLDER = 'KeepArchive';
 
   // Web DB Config
@@ -82,31 +89,53 @@ export class StatusService {
   private async scanNative() {
     try {
       // 1. Check Permissions
-      const permissions = await Filesystem.requestPermissions();
+      // On Android 11+, this might require MANAGE_EXTERNAL_STORAGE intent if not using SAF,
+      // but Capacitor Filesystem tries its best with standard permissions.
+      const permissions = await Filesystem.checkPermissions();
       
       if (permissions.publicStorage !== 'granted') {
-        this.toast.show('Storage permission denied', 'error');
+        const request = await Filesystem.requestPermissions();
+        if (request.publicStorage !== 'granted') {
+          this.toast.show('Storage permission denied', 'error');
+          return;
+        }
+      }
+
+      // 2. Iterate through potential paths
+      let foundFiles: any[] = [];
+      let successPath = '';
+
+      for (const path of this.WHATSAPP_PATHS) {
+        try {
+          const result = await Filesystem.readdir({
+            path: path,
+            // We use External storage but providing full path usually overrides if allowed
+            directory: Directory.External 
+          });
+          
+          if (result.files.length > 0) {
+            foundFiles = result.files;
+            successPath = path;
+            console.log(`Found statuses at: ${path}`);
+            break; // Stop at first valid path found
+          }
+        } catch (e) {
+          // Path likely doesn't exist or access denied, continue to next
+          console.warn(`Failed to read path: ${path}`, e);
+        }
+      }
+
+      if (foundFiles.length === 0) {
+        this.toast.show('No WhatsApp statuses found. Ensure you have viewed some statuses.', 'info');
         return;
       }
 
-      // 2. Read Directory
-      // Note: On Android 11+, this requires MANAGE_EXTERNAL_STORAGE to be granted via native intent usually.
-      // We attempt to read using the specific path provided.
-      const result = await Filesystem.readdir({
-        path: this.WHATSAPP_STATUS_PATH,
-        // We use External storage but providing full path usually overrides if allowed
-        directory: Directory.External 
-      });
-
-      console.log('Native files found:', result.files);
-
       const newStatuses: StatusItem[] = [];
 
-      for (const file of result.files) {
+      for (const file of foundFiles) {
         if (this.isMediaFile(file.name)) {
           // Construct a displayable URL (Capacitor specific)
-          // Ideally we read the file to get a blob, or use the webview-friendly path
-          const fullPath = `${this.WHATSAPP_STATUS_PATH}/${file.name}`;
+          const fullPath = `${successPath}/${file.name}`;
           const safeUrl = Capacitor.convertFileSrc(fullPath); 
           
           newStatuses.push({
@@ -476,3 +505,4 @@ export class StatusService {
     document.body.removeChild(a);
   }
 }
+
