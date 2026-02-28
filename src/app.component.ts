@@ -31,7 +31,7 @@ type AppView = 'home' | 'archive' | 'settings';
     @if (showSplash()) {
       <app-splash (finished)="onSplashFinished()" />
     } @else {
-      <div [class.dark]="isDarkMode()" class="h-full">
+      <div class="h-full">
         <div class="flex flex-col h-full bg-slate-50 dark:bg-slate-950 relative overflow-hidden text-slate-900 dark:text-slate-100 font-sans selection:bg-indigo-100 selection:text-indigo-900 dark:selection:bg-indigo-900 dark:selection:text-indigo-100 transition-colors duration-300">
           
           <!-- Global Toasts -->
@@ -111,12 +111,33 @@ export class AppComponent {
   selectedPlatform = signal('WhatsApp');
   showSplash = signal(true);
   viewingItem = signal<StatusItem | null>(null);
-  isDarkMode = signal(false);
+  isDarkMode = signal(true);
 
   constructor() {
-    // Check system preference initially
+    // Check system preference initially, but default to true if no preference or if dark is preferred
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    this.isDarkMode.set(prefersDark);
+    // We want dark mode by default, so we only set to false if user explicitly prefers light? 
+    // Or just default to true as requested.
+    // The user asked "make dark theme as default".
+    
+    // Let's initialize based on localStorage if available, otherwise default to true.
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      this.isDarkMode.set(savedTheme === 'dark');
+    } else {
+      this.isDarkMode.set(true);
+    }
+
+    effect(() => {
+      const isDark = this.isDarkMode();
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    });
   }
 
   onSplashFinished() {

@@ -6,6 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KeepArchive - Status Downloader</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   <style>
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
@@ -61,7 +73,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans antialiased h-screen flex flex-col overflow-hidden">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased h-screen flex flex-col overflow-hidden">
   <app-root></app-root>
 </body>
 </html>
