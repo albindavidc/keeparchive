@@ -1,5 +1,5 @@
 
-import { Component, signal, inject, computed, input } from '@angular/core';
+import { Component, signal, inject, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StatusService } from '../services/status.service';
 import { StatusCardComponent } from './status-card.component';
@@ -149,6 +149,7 @@ import { staggerList, slideUp, fadeAnimation } from '../animations';
             <app-status-card 
               [status]="item" 
               (onDownload)="downloadItem($event)"
+              (click)="viewItem(item)"
             />
           } @empty {
              <div class="col-span-full flex flex-col items-center justify-center py-24 text-slate-400 bg-white/50 backdrop-blur-sm rounded-3xl border-2 border-dashed border-slate-200/60">
@@ -212,8 +213,14 @@ export class DownloaderComponent {
     this.reset();
   }
 
+  onViewItem = output<any>();
+
   downloadItem(id: string) {
     this.statusService.toggleArchive(id);
+  }
+
+  viewItem(item: any) {
+    this.onViewItem.emit(item);
   }
 
   reset() {

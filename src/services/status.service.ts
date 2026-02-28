@@ -41,7 +41,7 @@ export class StatusService {
 
   // Native Config
   private readonly WHATSAPP_STATUS_PATH = '/storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/.Statuses';
-  private readonly DOWNLOAD_FOLDER = 'SavedStatuses';
+  private readonly DOWNLOAD_FOLDER = 'KeepArchive';
 
   // Web DB Config
   private readonly DB_NAME = 'KeepArchiveDB';
@@ -307,21 +307,39 @@ export class StatusService {
   }
 
   private async nativeCopy(item: StatusItem) {
-    // Read the source
-    const file = await Filesystem.readFile({
-      path: item.nativePath!,
-      // We assume source is external per previous logic
-    });
+    const fileName = item.id;
+    const destPath = `${this.DOWNLOAD_FOLDER}/${fileName}`;
     
-    const destName = `KA_${Date.now()}_${item.id}`;
-    
-    // Write to documents
-    await Filesystem.writeFile({
-      path: `${this.DOWNLOAD_FOLDER}/${destName}`,
-      data: file.data,
-      directory: Directory.Documents,
-      recursive: true // Create folder if missing
-    });
+    try {
+      // 1. Explicitly create the directory to ensure it exists
+      try {
+        await Filesystem.mkdir({
+          path: this.DOWNLOAD_FOLDER,
+          directory: Directory.Documents,
+          recursive: true
+        });
+      } catch (e) {
+        // Directory might already exist, which is fine
+      }
+
+      // 2. Read the source file
+      // We use the absolute path from the item
+      const file = await Filesystem.readFile({
+        path: item.nativePath!
+      });
+      
+      // 3. Write to the destination in Documents/KeepArchive
+      await Filesystem.writeFile({
+        path: destPath,
+        data: file.data,
+        directory: Directory.Documents,
+        recursive: true
+      });
+
+    } catch (err) {
+      console.error('Native save failed:', err);
+      throw new Error('Failed to save file to device storage');
+    }
   }
 
   removeFromArchive(id: string) {

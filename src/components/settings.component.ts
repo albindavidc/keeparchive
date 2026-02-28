@@ -89,7 +89,7 @@ export class SettingsComponent {
   
   // Mock settings state
   settings = {
-    autosave: false,
+    autosave: true,
     highQuality: true
   };
 
