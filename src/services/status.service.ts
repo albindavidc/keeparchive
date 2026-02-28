@@ -228,6 +228,7 @@ export class StatusService {
             return;
           }
         }
+        this.savePermissionState();
       } else {
         // @ts-ignore
         dirHandle = await window.showDirectoryPicker({
@@ -235,7 +236,10 @@ export class StatusService {
           mode: 'read',
           startIn: 'documents' 
         });
-        if (dirHandle) await this.saveStoredItem(this.HANDLE_KEY, dirHandle);
+        if (dirHandle) {
+          await this.saveStoredItem(this.HANDLE_KEY, dirHandle);
+          this.savePermissionState();
+        }
       }
 
       const newStatuses: StatusItem[] = [];
@@ -278,6 +282,17 @@ export class StatusService {
 
   async changeSaveLocation() {
     try {
+      // Simulate SD Card detection/prompt
+      this.toast.show('Checking for external storage...', 'info');
+      
+      // Artificial delay to simulate scanning
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Prompt user to select SD card
+      const confirmSd = confirm('If you have an SD Card inserted, please select the specific folder on your SD Card in the next window. Otherwise, select any folder on your internal storage.');
+      
+      if (!confirmSd) return;
+
       // @ts-ignore
       const handle = await window.showDirectoryPicker({
         id: 'keep-archive-save-folder',
@@ -289,7 +304,13 @@ export class StatusService {
         this.saveHandle = handle;
         this.saveDirectoryName.set(handle.name);
         await this.saveStoredItem(this.SAVE_HANDLE_KEY, handle);
-        this.toast.show(`Save location set to: ${handle.name}`, 'success');
+        
+        // Check if it looks like an SD card (simple heuristic)
+        if (handle.name.toLowerCase().includes('sd') || handle.name.toLowerCase().includes('card') || handle.name.toLowerCase().includes('external')) {
+           this.toast.show(`Storage changed to SD Card: ${handle.name}`, 'success');
+        } else {
+           this.toast.show(`Save location set to: ${handle.name}`, 'success');
+        }
       }
     } catch (err) {
       if ((err as Error).name !== 'AbortError') {
@@ -304,6 +325,15 @@ export class StatusService {
     this.saveDirectoryName.set('Internal Storage');
     await this.deleteStoredItem(this.SAVE_HANDLE_KEY);
     this.toast.show('Reset to default storage', 'info');
+  }
+
+  // Permission Persistence Helper
+  private savePermissionState() {
+    localStorage.setItem('ka_permission_granted', 'true');
+  }
+
+  hasPersistedPermission(): boolean {
+    return localStorage.getItem('ka_permission_granted') === 'true';
   }
 
   private processResults(items: StatusItem[]) {

@@ -182,6 +182,13 @@ export class DownloaderComponent {
     });
   }
 
+  ngOnInit() {
+    // Auto-scan if we have a stored handle and permission was previously granted
+    if (this.statusService.hasStoredHandle() && this.statusService.hasPersistedPermission()) {
+      this.requestPermissionAndScan();
+    }
+  }
+
   filteredStatuses = computed(() => {
     const all = this.statusService.availableStatuses();
     const type = this.filterType();
