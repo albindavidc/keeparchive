@@ -20,18 +20,38 @@
   </script>
   <style>
     /* Custom Scrollbar */
+    :root {
+      --scrollbar-track: #f8fafc; /* slate-50 */
+      --scrollbar-thumb: #cbd5e1; /* slate-300 */
+      --scrollbar-thumb-hover: #94a3b8; /* slate-400 */
+    }
+
+    .dark {
+      --scrollbar-track: #020617; /* slate-950 */
+      --scrollbar-thumb: #334155; /* slate-700 */
+      --scrollbar-thumb-hover: #475569; /* slate-600 */
+    }
+
+    /* Webkit (Chrome, Safari, Edge) */
     ::-webkit-scrollbar {
       width: 8px;
+      height: 8px;
     }
     ::-webkit-scrollbar-track {
-      background: #f1f1f1; 
+      background: var(--scrollbar-track); 
     }
     ::-webkit-scrollbar-thumb {
-      background: #c7c7c7; 
+      background: var(--scrollbar-thumb); 
       border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #a8a8a8; 
+      background: var(--scrollbar-thumb-hover); 
+    }
+
+    /* Firefox */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
     }
     
     /* Glassmorphism Utilities */

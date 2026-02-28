@@ -282,35 +282,31 @@ export class StatusService {
 
   async changeSaveLocation() {
     try {
-      // Simulate SD Card detection/prompt
-      this.toast.show('Checking for external storage...', 'info');
-      
-      // Artificial delay to simulate scanning
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Prompt user to select SD card
-      const confirmSd = confirm('If you have an SD Card inserted, please select the specific folder on your SD Card in the next window. Otherwise, select any folder on your internal storage.');
+      // Prompt user to select SD card root
+      const confirmSd = confirm('To switch to SD Card storage:\n\n1. In the next screen, select your SD Card root folder (or any parent folder).\n2. We will automatically create a "KeepArchive" folder inside it to store your files.\n\nDo you want to proceed?');
       
       if (!confirmSd) return;
 
       // @ts-ignore
-      const handle = await window.showDirectoryPicker({
-        id: 'keep-archive-save-folder',
+      const rootHandle = await window.showDirectoryPicker({
+        id: 'sd-card-root-picker',
         mode: 'readwrite',
         startIn: 'documents'
       });
       
-      if (handle) {
-        this.saveHandle = handle;
-        this.saveDirectoryName.set(handle.name);
-        await this.saveStoredItem(this.SAVE_HANDLE_KEY, handle);
+      if (rootHandle) {
+        // Create or get 'KeepArchive' folder inside the selected root
+        // @ts-ignore
+        const archiveHandle = await rootHandle.getDirectoryHandle('KeepArchive', { create: true });
+
+        this.saveHandle = archiveHandle;
+        // Display path as "Parent/KeepArchive"
+        this.saveDirectoryName.set(`${rootHandle.name}/KeepArchive`);
         
-        // Check if it looks like an SD card (simple heuristic)
-        if (handle.name.toLowerCase().includes('sd') || handle.name.toLowerCase().includes('card') || handle.name.toLowerCase().includes('external')) {
-           this.toast.show(`Storage changed to SD Card: ${handle.name}`, 'success');
-        } else {
-           this.toast.show(`Save location set to: ${handle.name}`, 'success');
-        }
+        // Store the handle for the 'KeepArchive' folder, not the root
+        await this.saveStoredItem(this.SAVE_HANDLE_KEY, archiveHandle);
+        
+        this.toast.show(`Storage set to: ${rootHandle.name}/KeepArchive`, 'success');
       }
     } catch (err) {
       if ((err as Error).name !== 'AbortError') {

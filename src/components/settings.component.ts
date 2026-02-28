@@ -28,7 +28,7 @@ import { StatusService } from '../services/status.service';
                  Current: <span class="font-mono text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded">{{ statusService.saveDirectoryName() }}</span>
                </p>
                <p class="text-xs text-slate-400 dark:text-slate-500 mt-2">
-                 Choose a folder on your SD card or internal storage to save status files directly.
+                 Select your SD card or any storage location. A 'KeepArchive' folder will be automatically created to store your files.
                </p>
              </div>
              
