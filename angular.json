@@ -19,7 +19,6 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.json",
             "assets": [
-              "manifest.webmanifest",
               "favicon.svg",
               "icon.svg"
             ]

@@ -1,7 +1,6 @@
 
 import { Component, output, input, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PwaService } from '../services/pwa.service';
 
 @Component({
   selector: 'app-navbar',
@@ -37,18 +36,8 @@ import { PwaService } from '../services/pwa.service';
       <!-- Right Side Actions -->
       <div class="flex items-center gap-3">
         
-        <!-- Theme Toggle / PWA Install -->
+        <!-- Theme Toggle -->
         
-        <!-- Desktop: Install PWA (if available) -->
-        @if (pwaService.installable()) {
-          <button 
-            (click)="pwaService.promptInstall()"
-            class="hidden md:flex w-10 h-10 rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-900/20 items-center justify-center text-indigo-600 dark:text-indigo-400 transition-colors border border-transparent hover:border-indigo-100 dark:hover:border-indigo-800/30 mr-2"
-            title="Install App">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          </button>
-        }
-
         <!-- Desktop: Always Theme Toggle -->
         <button 
           (click)="toggleTheme.emit()"
@@ -60,15 +49,8 @@ import { PwaService } from '../services/pwa.service';
           }
         </button>
 
-        <!-- Mobile: Install PWA if available, else Theme Toggle -->
+        <!-- Mobile: Theme Toggle -->
         <div class="md:hidden">
-          @if (pwaService.installable()) {
-            <button 
-              (click)="pwaService.promptInstall()"
-              class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center transition-colors animate-pulse">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            </button>
-          } @else {
             <button 
               (click)="toggleTheme.emit()"
               class="w-10 h-10 rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-900/20 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors border border-transparent hover:border-indigo-100 dark:hover:border-indigo-800/30">
@@ -78,7 +60,6 @@ import { PwaService } from '../services/pwa.service';
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
               }
             </button>
-          }
         </div>
 
         <!-- Platform Dropdown -->
@@ -170,8 +151,6 @@ export class NavbarComponent {
   isDropdownOpen = signal(false);
   selectedPlatform = signal('WhatsApp');
   
-  pwaService = inject(PwaService);
-
   toggleDropdown() {
     this.isDropdownOpen.update(v => !v);
   }

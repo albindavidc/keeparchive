@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { slideUp } from '../animations';
 import { ToastService } from '../services/toast.service';
 import { StatusService } from '../services/status.service';
-import { PwaService } from '../services/pwa.service';
 
 @Component({
   selector: 'app-settings',
@@ -95,19 +94,6 @@ import { PwaService } from '../services/pwa.service';
                 class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
              </button>
           </div>
-
-          <div class="flex items-center justify-between p-6" *ngIf="pwaService.installable()">
-             <div>
-               <p class="font-medium text-slate-900 dark:text-white">Install App</p>
-               <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Install Archive on your device for a better experience</p>
-             </div>
-             <button 
-               (click)="pwaService.promptInstall()"
-               class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 flex items-center gap-2">
-               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-               Install
-             </button>
-          </div>
         </div>
       </div>
 
@@ -142,7 +128,6 @@ import { PwaService } from '../services/pwa.service';
 export class SettingsComponent {
   toast = inject(ToastService);
   statusService = inject(StatusService);
-  pwaService = inject(PwaService);
   
   // Mock settings state
   settings = {
