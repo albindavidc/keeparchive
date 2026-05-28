@@ -1,0 +1,9 @@
+{
+	"appId": "com.keeparchive.app",
+	"appName": "Archive",
+	"webDir": "dist",
+	"packageClassList": [
+		"AppPlugin",
+		"FilesystemPlugin"
+	]
+}

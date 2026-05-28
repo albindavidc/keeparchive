@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="en" data-beasties-container>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Archive</title>
+  <link rel="icon" type="image/svg+xml" href="/icon.svg">
+  <link rel="apple-touch-icon" href="/icon.svg">
+  <meta name="theme-color" content="#6366f1">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    :root {
+      --scrollbar-track: #f8fafc; /* slate-50 */
+      --scrollbar-thumb: #cbd5e1; /* slate-300 */
+      --scrollbar-thumb-hover: #94a3b8; /* slate-400 */
+    }
+
+    .dark {
+      --scrollbar-track: #020617; /* slate-950 */
+      --scrollbar-thumb: #334155; /* slate-700 */
+      --scrollbar-thumb-hover: #475569; /* slate-600 */
+    }
+
+    /* Webkit (Chrome, Safari, Edge) */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--scrollbar-track); 
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb); 
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--scrollbar-thumb-hover); 
+    }
+
+    /* Firefox */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    }
+    
+    /* Glassmorphism Utilities */
+    .glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .glass-dark {
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "rxjs": "https://esm.sh/rxjs@^7.8.2?conditions=es2015",
+    "rxjs/operators": "https://esm.sh/rxjs@^7.8.2/operators?conditions=es2015",
+    "rxjs/ajax": "https://esm.sh/rxjs@^7.8.2/ajax?conditions=es2015",
+    "rxjs/webSocket": "https://esm.sh/rxjs@^7.8.2/webSocket?conditions=es2015",
+    "rxjs/testing": "https://esm.sh/rxjs@^7.8.2/testing?conditions=es2015",
+    "rxjs/fetch": "https://esm.sh/rxjs@^7.8.2/fetch?conditions=es2015",
+    "@angular/compiler": "https://esm.sh/@angular/compiler@^21.1.4?external=rxjs",
+    "@angular/platform-browser": "https://esm.sh/@angular/platform-browser@^21.1.4?external=rxjs",
+    "@angular/core": "https://esm.sh/@angular/core@^21.1.4?external=rxjs",
+    "@angular/forms": "https://esm.sh/@angular/forms@^21.1.4?external=rxjs",
+    "@angular/common": "https://esm.sh/@angular/common@^21.1.4?external=rxjs",
+    "@angular/platform-browser/animations": "https://esm.sh/@angular/platform-browser@^21.1.4/animations?external=rxjs",
+    "@angular/animations": "https://esm.sh/@angular/animations@^21.1.4?external=rxjs",
+    "@capacitor/core": "https://esm.sh/@capacitor/core@6.0.0",
+    "@capacitor/filesystem": "https://esm.sh/@capacitor/filesystem@6.0.0",
+    "@capacitor/app": "https://esm.sh/@capacitor/app@6.0.0",
+    "@angular/platform-browser/": "https://esm.sh/@angular/platform-browser@^21.2.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased h-screen flex flex-col overflow-hidden">
+  <app-root></app-root>
+<link rel="modulepreload" href="chunk-JSHBUF2E.js"><script src="main-5EJ53TVQ.js" type="module"></script></body>
+</html>
